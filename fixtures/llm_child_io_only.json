@@ -1,0 +1,524 @@
+{
+  "scenario": "s2",
+  "conversation_id": "brand-span-isolation-conversation",
+  "root_carries": "no message attributes at all",
+  "summary": "Turn root carries no messages, so only the nested LLM and tool spans have content.",
+  "turns": [
+    {
+      "turn": 1,
+      "user": "USER-T1 What is my current balance?",
+      "reply": "REPLY-T1 Your balance is $11,111.11.",
+      "export_request": {
+        "resourceSpans": [
+          {
+            "resource": {
+              "attributes": [
+                {
+                  "key": "service.name",
+                  "value": {
+                    "stringValue": "brand-assistant"
+                  }
+                },
+                {
+                  "key": "deployment.environment",
+                  "value": {
+                    "stringValue": "verification"
+                  }
+                }
+              ]
+            },
+            "scopeSpans": [
+              {
+                "scope": {
+                  "name": "vendor.otel"
+                },
+                "spans": [
+                  {
+                    "traceId": "01010101010101010101010101010101",
+                    "spanId": "01a101a101a101a1",
+                    "name": "invoke_agent brand-assistant",
+                    "kind": 1,
+                    "startTimeUnixNano": "1789600000000000000",
+                    "endTimeUnixNano": "1789600004000000000",
+                    "attributes": [
+                      {
+                        "key": "gen_ai.operation.name",
+                        "value": {
+                          "stringValue": "invoke_agent"
+                        }
+                      },
+                      {
+                        "key": "gen_ai.agent.name",
+                        "value": {
+                          "stringValue": "brand-assistant"
+                        }
+                      },
+                      {
+                        "key": "gen_ai.conversation.id",
+                        "value": {
+                          "stringValue": "brand-span-isolation-conversation"
+                        }
+                      }
+                    ]
+                  },
+                  {
+                    "traceId": "01010101010101010101010101010101",
+                    "spanId": "01b201b201b201b2",
+                    "name": "chat gpt-4o-mini",
+                    "kind": 1,
+                    "startTimeUnixNano": "1789600000100000000",
+                    "endTimeUnixNano": "1789600000900000000",
+                    "attributes": [
+                      {
+                        "key": "gen_ai.operation.name",
+                        "value": {
+                          "stringValue": "chat"
+                        }
+                      },
+                      {
+                        "key": "gen_ai.request.model",
+                        "value": {
+                          "stringValue": "gpt-4o-mini"
+                        }
+                      },
+                      {
+                        "key": "gen_ai.input.messages",
+                        "value": {
+                          "stringValue": "[{\"role\": \"user\", \"parts\": [{\"type\": \"text\", \"content\": \"USER-T1 What is my current balance?\"}]}]"
+                        }
+                      },
+                      {
+                        "key": "gen_ai.output.messages",
+                        "value": {
+                          "stringValue": "[{\"role\": \"assistant\", \"parts\": [{\"type\": \"text\", \"content\": \"INTERMEDIATE-TOOLCALL-STEP calling lookup_account\"}]}]"
+                        }
+                      }
+                    ],
+                    "parentSpanId": "01a101a101a101a1"
+                  },
+                  {
+                    "traceId": "01010101010101010101010101010101",
+                    "spanId": "01c301c301c301c3",
+                    "name": "execute_tool lookup_account",
+                    "kind": 1,
+                    "startTimeUnixNano": "1789600001000000000",
+                    "endTimeUnixNano": "1789600002000000000",
+                    "attributes": [
+                      {
+                        "key": "gen_ai.operation.name",
+                        "value": {
+                          "stringValue": "execute_tool"
+                        }
+                      },
+                      {
+                        "key": "gen_ai.tool.name",
+                        "value": {
+                          "stringValue": "lookup_account"
+                        }
+                      },
+                      {
+                        "key": "gen_ai.tool.call.arguments",
+                        "value": {
+                          "stringValue": "{\"account_ref\": \"AX-ACCOUNT-T1\"}"
+                        }
+                      },
+                      {
+                        "key": "gen_ai.tool.call.result",
+                        "value": {
+                          "stringValue": "{\"result\": \"balance=11111.11 currency=USD\", \"audit\": {\"request_id\": \"req-0001-8f2ac1de-1\", \"caller_identity\": \"svc-brand-assistant@example.internal\", \"policy_evaluations\": [{\"policy\": \"pci.account_read\", \"decision\": \"allow\", \"latency_ms\": 4}, {\"policy\": \"pii.egress_scan\", \"decision\": \"allow\", \"matches\": 0, \"latency_ms\": 11}, {\"policy\": \"geo.residency\", \"decision\": \"allow\", \"region\": \"us-east-1\", \"latency_ms\": 2}], \"downstream_calls\": [{\"system\": \"core-ledger\", \"op\": \"GET /accounts/{ref}/balance\", \"status\": 200, \"ms\": 38}, {\"system\": \"fraud-signals\", \"op\": \"POST /score\", \"status\": 200, \"ms\": 22}], \"retention\": {\"class\": \"operational\", \"ttl_days\": 400, \"legal_hold\": false}, \"trace_flags\": {\"sampled\": true, \"debug\": false}, \"notes\": \"Emitted by the tool wrapper for every invocation regardless of outcome.\"}}"
+                        }
+                      }
+                    ],
+                    "parentSpanId": "01a101a101a101a1"
+                  },
+                  {
+                    "traceId": "01010101010101010101010101010101",
+                    "spanId": "01d401d401d401d4",
+                    "name": "chat gpt-4o-mini",
+                    "kind": 1,
+                    "startTimeUnixNano": "1789600002100000000",
+                    "endTimeUnixNano": "1789600003800000000",
+                    "attributes": [
+                      {
+                        "key": "gen_ai.operation.name",
+                        "value": {
+                          "stringValue": "chat"
+                        }
+                      },
+                      {
+                        "key": "gen_ai.request.model",
+                        "value": {
+                          "stringValue": "gpt-4o-mini"
+                        }
+                      },
+                      {
+                        "key": "gen_ai.input.messages",
+                        "value": {
+                          "stringValue": "[{\"role\": \"tool\", \"parts\": [{\"type\": \"text\", \"content\": \"balance=11111.11 currency=USD\"}]}]"
+                        }
+                      },
+                      {
+                        "key": "gen_ai.output.messages",
+                        "value": {
+                          "stringValue": "[{\"role\": \"assistant\", \"parts\": [{\"type\": \"text\", \"content\": \"REPLY-T1 Your balance is $11,111.11.\"}]}]"
+                        }
+                      }
+                    ],
+                    "parentSpanId": "01a101a101a101a1"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      "expect_output_contains": "INTERMEDIATE-TOOLCALL-STEP",
+      "expect_output_excludes": "REPLY-T1",
+      "expect_input_contains": "USER-T1"
+    },
+    {
+      "turn": 2,
+      "user": "USER-T2 And when was my last payment?",
+      "reply": "REPLY-T2 Your last payment was $2,222.22 on 3 March.",
+      "export_request": {
+        "resourceSpans": [
+          {
+            "resource": {
+              "attributes": [
+                {
+                  "key": "service.name",
+                  "value": {
+                    "stringValue": "brand-assistant"
+                  }
+                },
+                {
+                  "key": "deployment.environment",
+                  "value": {
+                    "stringValue": "verification"
+                  }
+                }
+              ]
+            },
+            "scopeSpans": [
+              {
+                "scope": {
+                  "name": "vendor.otel"
+                },
+                "spans": [
+                  {
+                    "traceId": "02020202020202020202020202020202",
+                    "spanId": "02a102a102a102a1",
+                    "name": "invoke_agent brand-assistant",
+                    "kind": 1,
+                    "startTimeUnixNano": "1789600010000000000",
+                    "endTimeUnixNano": "1789600014000000000",
+                    "attributes": [
+                      {
+                        "key": "gen_ai.operation.name",
+                        "value": {
+                          "stringValue": "invoke_agent"
+                        }
+                      },
+                      {
+                        "key": "gen_ai.agent.name",
+                        "value": {
+                          "stringValue": "brand-assistant"
+                        }
+                      },
+                      {
+                        "key": "gen_ai.conversation.id",
+                        "value": {
+                          "stringValue": "brand-span-isolation-conversation"
+                        }
+                      }
+                    ]
+                  },
+                  {
+                    "traceId": "02020202020202020202020202020202",
+                    "spanId": "02b202b202b202b2",
+                    "name": "chat gpt-4o-mini",
+                    "kind": 1,
+                    "startTimeUnixNano": "1789600010100000000",
+                    "endTimeUnixNano": "1789600010900000000",
+                    "attributes": [
+                      {
+                        "key": "gen_ai.operation.name",
+                        "value": {
+                          "stringValue": "chat"
+                        }
+                      },
+                      {
+                        "key": "gen_ai.request.model",
+                        "value": {
+                          "stringValue": "gpt-4o-mini"
+                        }
+                      },
+                      {
+                        "key": "gen_ai.input.messages",
+                        "value": {
+                          "stringValue": "[{\"role\": \"user\", \"parts\": [{\"type\": \"text\", \"content\": \"USER-T2 And when was my last payment?\"}]}]"
+                        }
+                      },
+                      {
+                        "key": "gen_ai.output.messages",
+                        "value": {
+                          "stringValue": "[{\"role\": \"assistant\", \"parts\": [{\"type\": \"text\", \"content\": \"INTERMEDIATE-TOOLCALL-STEP calling lookup_account\"}]}]"
+                        }
+                      }
+                    ],
+                    "parentSpanId": "02a102a102a102a1"
+                  },
+                  {
+                    "traceId": "02020202020202020202020202020202",
+                    "spanId": "02c302c302c302c3",
+                    "name": "execute_tool lookup_account",
+                    "kind": 1,
+                    "startTimeUnixNano": "1789600011000000000",
+                    "endTimeUnixNano": "1789600012000000000",
+                    "attributes": [
+                      {
+                        "key": "gen_ai.operation.name",
+                        "value": {
+                          "stringValue": "execute_tool"
+                        }
+                      },
+                      {
+                        "key": "gen_ai.tool.name",
+                        "value": {
+                          "stringValue": "lookup_account"
+                        }
+                      },
+                      {
+                        "key": "gen_ai.tool.call.arguments",
+                        "value": {
+                          "stringValue": "{\"account_ref\": \"AX-ACCOUNT-T2\"}"
+                        }
+                      },
+                      {
+                        "key": "gen_ai.tool.call.result",
+                        "value": {
+                          "stringValue": "{\"result\": \"last_payment=2222.22 date=2026-03-03\", \"audit\": {\"request_id\": \"req-0002-8f2ac1de-2\", \"caller_identity\": \"svc-brand-assistant@example.internal\", \"policy_evaluations\": [{\"policy\": \"pci.account_read\", \"decision\": \"allow\", \"latency_ms\": 4}, {\"policy\": \"pii.egress_scan\", \"decision\": \"allow\", \"matches\": 0, \"latency_ms\": 11}, {\"policy\": \"geo.residency\", \"decision\": \"allow\", \"region\": \"us-east-1\", \"latency_ms\": 2}], \"downstream_calls\": [{\"system\": \"core-ledger\", \"op\": \"GET /accounts/{ref}/balance\", \"status\": 200, \"ms\": 38}, {\"system\": \"fraud-signals\", \"op\": \"POST /score\", \"status\": 200, \"ms\": 22}], \"retention\": {\"class\": \"operational\", \"ttl_days\": 400, \"legal_hold\": false}, \"trace_flags\": {\"sampled\": true, \"debug\": false}, \"notes\": \"Emitted by the tool wrapper for every invocation regardless of outcome.\"}}"
+                        }
+                      }
+                    ],
+                    "parentSpanId": "02a102a102a102a1"
+                  },
+                  {
+                    "traceId": "02020202020202020202020202020202",
+                    "spanId": "02d402d402d402d4",
+                    "name": "chat gpt-4o-mini",
+                    "kind": 1,
+                    "startTimeUnixNano": "1789600012100000000",
+                    "endTimeUnixNano": "1789600013800000000",
+                    "attributes": [
+                      {
+                        "key": "gen_ai.operation.name",
+                        "value": {
+                          "stringValue": "chat"
+                        }
+                      },
+                      {
+                        "key": "gen_ai.request.model",
+                        "value": {
+                          "stringValue": "gpt-4o-mini"
+                        }
+                      },
+                      {
+                        "key": "gen_ai.input.messages",
+                        "value": {
+                          "stringValue": "[{\"role\": \"tool\", \"parts\": [{\"type\": \"text\", \"content\": \"last_payment=2222.22 date=2026-03-03\"}]}]"
+                        }
+                      },
+                      {
+                        "key": "gen_ai.output.messages",
+                        "value": {
+                          "stringValue": "[{\"role\": \"assistant\", \"parts\": [{\"type\": \"text\", \"content\": \"REPLY-T2 Your last payment was $2,222.22 on 3 March.\"}]}]"
+                        }
+                      }
+                    ],
+                    "parentSpanId": "02a102a102a102a1"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      "expect_output_contains": "INTERMEDIATE-TOOLCALL-STEP",
+      "expect_output_excludes": "REPLY-T2",
+      "expect_input_contains": "USER-T2"
+    },
+    {
+      "turn": 3,
+      "user": "USER-T3 Please email me the statement.",
+      "reply": "REPLY-T3 Sent, check your inbox shortly.",
+      "export_request": {
+        "resourceSpans": [
+          {
+            "resource": {
+              "attributes": [
+                {
+                  "key": "service.name",
+                  "value": {
+                    "stringValue": "brand-assistant"
+                  }
+                },
+                {
+                  "key": "deployment.environment",
+                  "value": {
+                    "stringValue": "verification"
+                  }
+                }
+              ]
+            },
+            "scopeSpans": [
+              {
+                "scope": {
+                  "name": "vendor.otel"
+                },
+                "spans": [
+                  {
+                    "traceId": "03030303030303030303030303030303",
+                    "spanId": "03a103a103a103a1",
+                    "name": "invoke_agent brand-assistant",
+                    "kind": 1,
+                    "startTimeUnixNano": "1789600020000000000",
+                    "endTimeUnixNano": "1789600024000000000",
+                    "attributes": [
+                      {
+                        "key": "gen_ai.operation.name",
+                        "value": {
+                          "stringValue": "invoke_agent"
+                        }
+                      },
+                      {
+                        "key": "gen_ai.agent.name",
+                        "value": {
+                          "stringValue": "brand-assistant"
+                        }
+                      },
+                      {
+                        "key": "gen_ai.conversation.id",
+                        "value": {
+                          "stringValue": "brand-span-isolation-conversation"
+                        }
+                      }
+                    ]
+                  },
+                  {
+                    "traceId": "03030303030303030303030303030303",
+                    "spanId": "03b203b203b203b2",
+                    "name": "chat gpt-4o-mini",
+                    "kind": 1,
+                    "startTimeUnixNano": "1789600020100000000",
+                    "endTimeUnixNano": "1789600020900000000",
+                    "attributes": [
+                      {
+                        "key": "gen_ai.operation.name",
+                        "value": {
+                          "stringValue": "chat"
+                        }
+                      },
+                      {
+                        "key": "gen_ai.request.model",
+                        "value": {
+                          "stringValue": "gpt-4o-mini"
+                        }
+                      },
+                      {
+                        "key": "gen_ai.input.messages",
+                        "value": {
+                          "stringValue": "[{\"role\": \"user\", \"parts\": [{\"type\": \"text\", \"content\": \"USER-T3 Please email me the statement.\"}]}]"
+                        }
+                      },
+                      {
+                        "key": "gen_ai.output.messages",
+                        "value": {
+                          "stringValue": "[{\"role\": \"assistant\", \"parts\": [{\"type\": \"text\", \"content\": \"INTERMEDIATE-TOOLCALL-STEP calling lookup_account\"}]}]"
+                        }
+                      }
+                    ],
+                    "parentSpanId": "03a103a103a103a1"
+                  },
+                  {
+                    "traceId": "03030303030303030303030303030303",
+                    "spanId": "03c303c303c303c3",
+                    "name": "execute_tool lookup_account",
+                    "kind": 1,
+                    "startTimeUnixNano": "1789600021000000000",
+                    "endTimeUnixNano": "1789600022000000000",
+                    "attributes": [
+                      {
+                        "key": "gen_ai.operation.name",
+                        "value": {
+                          "stringValue": "execute_tool"
+                        }
+                      },
+                      {
+                        "key": "gen_ai.tool.name",
+                        "value": {
+                          "stringValue": "lookup_account"
+                        }
+                      },
+                      {
+                        "key": "gen_ai.tool.call.arguments",
+                        "value": {
+                          "stringValue": "{\"account_ref\": \"AX-ACCOUNT-T3\"}"
+                        }
+                      },
+                      {
+                        "key": "gen_ai.tool.call.result",
+                        "value": {
+                          "stringValue": "{\"result\": \"statement_email=queued ref=ST-99812\", \"audit\": {\"request_id\": \"req-0003-8f2ac1de-3\", \"caller_identity\": \"svc-brand-assistant@example.internal\", \"policy_evaluations\": [{\"policy\": \"pci.account_read\", \"decision\": \"allow\", \"latency_ms\": 4}, {\"policy\": \"pii.egress_scan\", \"decision\": \"allow\", \"matches\": 0, \"latency_ms\": 11}, {\"policy\": \"geo.residency\", \"decision\": \"allow\", \"region\": \"us-east-1\", \"latency_ms\": 2}], \"downstream_calls\": [{\"system\": \"core-ledger\", \"op\": \"GET /accounts/{ref}/balance\", \"status\": 200, \"ms\": 38}, {\"system\": \"fraud-signals\", \"op\": \"POST /score\", \"status\": 200, \"ms\": 22}], \"retention\": {\"class\": \"operational\", \"ttl_days\": 400, \"legal_hold\": false}, \"trace_flags\": {\"sampled\": true, \"debug\": false}, \"notes\": \"Emitted by the tool wrapper for every invocation regardless of outcome.\"}}"
+                        }
+                      }
+                    ],
+                    "parentSpanId": "03a103a103a103a1"
+                  },
+                  {
+                    "traceId": "03030303030303030303030303030303",
+                    "spanId": "03d403d403d403d4",
+                    "name": "chat gpt-4o-mini",
+                    "kind": 1,
+                    "startTimeUnixNano": "1789600022100000000",
+                    "endTimeUnixNano": "1789600023800000000",
+                    "attributes": [
+                      {
+                        "key": "gen_ai.operation.name",
+                        "value": {
+                          "stringValue": "chat"
+                        }
+                      },
+                      {
+                        "key": "gen_ai.request.model",
+                        "value": {
+                          "stringValue": "gpt-4o-mini"
+                        }
+                      },
+                      {
+                        "key": "gen_ai.input.messages",
+                        "value": {
+                          "stringValue": "[{\"role\": \"tool\", \"parts\": [{\"type\": \"text\", \"content\": \"statement_email=queued ref=ST-99812\"}]}]"
+                        }
+                      },
+                      {
+                        "key": "gen_ai.output.messages",
+                        "value": {
+                          "stringValue": "[{\"role\": \"assistant\", \"parts\": [{\"type\": \"text\", \"content\": \"REPLY-T3 Sent, check your inbox shortly.\"}]}]"
+                        }
+                      }
+                    ],
+                    "parentSpanId": "03a103a103a103a1"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      "expect_output_contains": "INTERMEDIATE-TOOLCALL-STEP",
+      "expect_output_excludes": "REPLY-T3",
+      "expect_input_contains": "USER-T3"
+    }
+  ]
+}

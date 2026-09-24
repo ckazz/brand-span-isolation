@@ -1,0 +1,154 @@
+
+== s1: Turn root carries the turn's own messages. This is the shape currently reported as being sent.
+  turn root carries: gen_ai.input.messages and gen_ai.output.messages
+  log stream:        turn-io-evidence-s1-0558e4d6
+  posted 3 turns, 11,971 characters
+
+  Stage 2, what was stored as each turn:
+    turn 1 input :  USER-T1 What is my current balance?
+    turn 1 output:  REPLY-T1 Your balance is $11,111.11.
+    turn 2 input :  USER-T2 And when was my last payment?
+    turn 2 output:  REPLY-T2 Your last payment was $2,222.22 on 3 March.
+    turn 3 input :  USER-T3 Please email me the statement.
+    turn 3 output:  REPLY-T3 Sent, check your inbox shortly.
+
+  Stage 3, what a session-scoped judge receives with the trace input and
+  output only setting: the ordered list above and nothing else.
+[
+  {
+    "session_id": "415280bd-aa95-4bdf-b96a-da04d110d962",
+    "traces": [
+      {
+        "input": "USER-T1 What is my current balance?",
+        "output": "REPLY-T1 Your balance is $11,111.11."
+      },
+      {
+        "input": "USER-T2 And when was my last payment?",
+        "output": "REPLY-T2 Your last payment was $2,222.22 on 3 March."
+      },
+      {
+        "input": "USER-T3 Please email me the statement.",
+        "output": "REPLY-T3 Sent, check your inbox shortly."
+      }
+    ]
+  }
+]
+
+  Reduction: 11,971 characters sent -> 238 stored as turn text
+             -> 379 characters of judge input (3% of the payload)
+
+    ok    all turns linked into one session
+    ok    turn 1 input contains USER-T1
+    ok    turn 1 output contains REPLY-T1
+    ok    turn 1 output excludes INTERMEDIATE-TOOLCALL-STEP
+    ok    turn 2 input contains USER-T2
+    ok    turn 2 output contains REPLY-T2
+    ok    turn 2 output excludes INTERMEDIATE-TOOLCALL-STEP
+    ok    turn 3 input contains USER-T3
+    ok    turn 3 output contains REPLY-T3
+    ok    turn 3 output excludes INTERMEDIATE-TOOLCALL-STEP
+
+== s2: Turn root carries no messages, so only the nested LLM and tool spans have content. 
+  turn root carries: no message attributes at all
+  log stream:        turn-io-evidence-s2-0558e4d6
+  posted 3 turns, 10,905 characters
+
+  Stage 2, what was stored as each turn:
+    turn 1 input :  USER-T1 What is my current balance?
+    turn 1 output:  INTERMEDIATE-TOOLCALL-STEP calling lookup_account
+    turn 2 input :  USER-T2 And when was my last payment?
+    turn 2 output:  INTERMEDIATE-TOOLCALL-STEP calling lookup_account
+    turn 3 input :  USER-T3 Please email me the statement.
+    turn 3 output:  INTERMEDIATE-TOOLCALL-STEP calling lookup_account
+
+  Stage 3, what a session-scoped judge receives with the trace input and
+  output only setting: the ordered list above and nothing else.
+[
+  {
+    "session_id": "7b810c39-7b1e-4f12-ac62-8d3d2e23b446",
+    "traces": [
+      {
+        "input": "USER-T1 What is my current balance?",
+        "output": "INTERMEDIATE-TOOLCALL-STEP calling lookup_account"
+      },
+      {
+        "input": "USER-T2 And when was my last payment?",
+        "output": "INTERMEDIATE-TOOLCALL-STEP calling lookup_account"
+      },
+      {
+        "input": "USER-T3 Please email me the statement.",
+        "output": "INTERMEDIATE-TOOLCALL-STEP calling lookup_account"
+      }
+    ]
+  }
+]
+
+  Reduction: 10,905 characters sent -> 257 stored as turn text
+             -> 398 characters of judge input (3% of the payload)
+
+    ok    all turns linked into one session
+    ok    turn 1 input contains USER-T1
+    ok    turn 1 output contains INTERMEDIATE-TOOLCALL-STEP
+    ok    turn 1 output excludes REPLY-T1
+    ok    turn 2 input contains USER-T2
+    ok    turn 2 output contains INTERMEDIATE-TOOLCALL-STEP
+    ok    turn 2 output excludes REPLY-T2
+    ok    turn 3 input contains USER-T3
+    ok    turn 3 output contains INTERMEDIATE-TOOLCALL-STEP
+    ok    turn 3 output excludes REPLY-T3
+
+== s3: Turn root carries its messages in the older indexed attribute style. ====
+  turn root carries: indexed gen_ai.prompt.N and gen_ai.completion.N
+  log stream:        turn-io-evidence-s3-0558e4d6
+  posted 3 turns, 11,920 characters
+
+  Stage 2, what was stored as each turn:
+    turn 1 input :  USER-T1 What is my current balance?
+    turn 1 output:  REPLY-T1 Your balance is $11,111.11.
+    turn 2 input :  USER-T2 And when was my last payment?
+    turn 2 output:  REPLY-T2 Your last payment was $2,222.22 on 3 March.
+    turn 3 input :  USER-T3 Please email me the statement.
+    turn 3 output:  REPLY-T3 Sent, check your inbox shortly.
+
+  Stage 3, what a session-scoped judge receives with the trace input and
+  output only setting: the ordered list above and nothing else.
+[
+  {
+    "session_id": "c003e9d5-a4a7-499b-b6d7-183e40b24e42",
+    "traces": [
+      {
+        "input": "USER-T1 What is my current balance?",
+        "output": "REPLY-T1 Your balance is $11,111.11."
+      },
+      {
+        "input": "USER-T2 And when was my last payment?",
+        "output": "REPLY-T2 Your last payment was $2,222.22 on 3 March."
+      },
+      {
+        "input": "USER-T3 Please email me the statement.",
+        "output": "REPLY-T3 Sent, check your inbox shortly."
+      }
+    ]
+  }
+]
+
+  Reduction: 11,920 characters sent -> 238 stored as turn text
+             -> 379 characters of judge input (3% of the payload)
+
+    ok    all turns linked into one session
+    ok    turn 1 input contains USER-T1
+    ok    turn 1 output contains REPLY-T1
+    ok    turn 1 output excludes INTERMEDIATE-TOOLCALL-STEP
+    ok    turn 2 input contains USER-T2
+    ok    turn 2 output contains REPLY-T2
+    ok    turn 2 output excludes INTERMEDIATE-TOOLCALL-STEP
+    ok    turn 3 input contains USER-T3
+    ok    turn 3 output contains REPLY-T3
+    ok    turn 3 output excludes INTERMEDIATE-TOOLCALL-STEP
+
+== SUMMARY =====================================================================
+  s1  PASS  gen_ai.input.messages and gen_ai.output.messages
+  s2  PASS  no message attributes at all
+  s3  PASS  indexed gen_ai.prompt.N and gen_ai.completion.N
+
+  project brand-span-isolation, log streams suffixed -0558e4d6
