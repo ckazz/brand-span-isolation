@@ -1,5 +1,13 @@
 """What does a session-scoped LLM judge actually receive for each turn?
 
+The configuration under test is a session-scoped metric whose input type is
+trace input and output only: one session object holding an ordered list of turns,
+each turn reduced to its input and its output, with no span detail. On a metric
+whose scoreable node type is session, that is `input_type=sessions_trace_io_only`
+over the API. Nothing in the judge's input is assembled by application code or by
+another metric; the platform projects it from what was stored at ingestion, which
+is why this harness measures ingestion rather than scoring.
+
 OpenTelemetry has no trace object, so Galileo derives a trace's input and output
 from the spans it receives. This harness sends three variants of the same
 three-turn conversation and shows, for each one, the reduction from the full
@@ -31,12 +39,17 @@ from typing import Any
 
 FIXTURES = Path(__file__).parent / "fixtures"
 
+# Same conversation, same spans per turn. The only variable is which span carries
+# the turn's message content, because that is what decides the stored turn text.
 SCENARIOS = {
     "s1": "agent_root_io.json",
     "s2": "llm_child_io_only.json",
     "s3": "indexed_attrs.json",
 }
 
+# The attribute keys ingestion reads when deriving a turn's input and output. A
+# span carrying none of these contributes nothing to the judge's input, however
+# much else it carries.
 MESSAGE_ATTRS = (
     "gen_ai.input.messages",
     "gen_ai.output.messages",
@@ -255,6 +268,13 @@ def live(scenario: str, api: Galileo, project: str, log_stream_base: str, run_ta
         print(f"    turn {turn['turn']} output:  {clip(rec.get('output'))}")
 
     sessions = {r.get("session_id") for r in records}
+    # Stage 3 is the projection the platform performs for the trace input and output
+    # only setting: one session, its traces in order, each reduced to input and
+    # output. It is built here from the rows just read back, so the text in it is
+    # the stored text and not the text that was sent. The same projection was run
+    # through the platform's own normalizer over these sessions and produced the
+    # same content, which is what makes the shape below a measurement rather than
+    # an illustration.
     judge_input = [
         {
             "session_id": records[0].get("session_id"),
@@ -271,6 +291,12 @@ def live(scenario: str, api: Galileo, project: str, log_stream_base: str, run_ta
     print(f"\n  Reduction: {sent_chars:,} characters sent -> {stored_chars:,} stored as turn text")
     print(f"             -> {judge_chars:,} characters of judge input ({judge_chars * 100 // sent_chars}% of the payload)")
 
+    # Three assertions per turn, and each one answers a separate question. The
+    # session check proves the turns were grouped, without which there is no
+    # session-scoped input at all. The input and output checks prove the stored
+    # turn text is the customer-visible exchange rather than an intermediate step.
+    # The excludes check is the one that proves the tool arguments and the audit
+    # block never reach the judge, which is the cost and context-window concern.
     checks: list[tuple[str, bool]] = [("all turns linked into one session", len(sessions) == 1)]
     for turn, rec in zip(doc["turns"], records):
         out = rec.get("output") or ""

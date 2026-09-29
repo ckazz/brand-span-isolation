@@ -115,7 +115,12 @@ The console has no control for the per-turn input setting, so a metric that read
 input and output is created and maintained over the API. The sequence below was run against a
 deployment on the 1.11x line on 2026-09-23, and the behaviour described is what it returned.
 
-**1. Create the metric.** `POST /scorers`
+A note on prefixes before the calls themselves. The metric routes are served both under the public
+`/v2` prefix and unprefixed, so `POST /v2/scorers` and `POST /scorers` reach the same handler; the
+`/v2` form is the one to build against. The scorer-settings route in step 3 is served unprefixed only,
+which is why it appears below without a prefix.
+
+**1. Create the metric.** `POST /v2/scorers`
 
 ```json
 {
@@ -134,7 +139,7 @@ the metric session scoped, and if `input_type` is left out the server fills it i
 `sessions_normalized`, the full span detail form. `defaults` is required when `scorer_type` is `llm`.
 The response carries the new metric's `id`.
 
-**2. Add the judge prompt as a version.** `POST /scorers/{scorer_id}/version/llm`
+**2. Add the judge prompt as a version.** `POST /v2/scorers/{scorer_id}/version/llm`
 
 ```json
 {"user_prompt": "Does the assistant maintain a professional brand tone across the whole conversation?"}
@@ -160,8 +165,8 @@ so send every metric that should stay on.
 
 Reading the result back:
 
-- `GET /scorers/{scorer_id}` returns `input_type` and `default_version_id`.
-- `GET /scorers/{scorer_id}/versions` returns each version with its assembled prompt.
+- `GET /v2/scorers/{scorer_id}` returns `input_type` and `default_version_id`.
+- `GET /v2/scorers/{scorer_id}/versions` returns each version with its assembled prompt.
 - `GET /projects/{project_id}/runs/{log_stream_id}/scorer-settings` returns the enabled metrics and
   the version each is pinned to.
 
@@ -174,7 +179,7 @@ Two things to know before building on this:
 - `scoreable_node_types` cannot be changed after the metric exists. The API refuses it with "The
   field 'scoreable_node_types' cannot be changed after a scorer is created." Moving a metric between
   session scope and trace scope means creating a new metric.
-- `input_type` can be changed later with `PATCH /scorers/{scorer_id}`, and that patch does not
+- `input_type` can be changed later with `PATCH /v2/scorers/{scorer_id}`, and that patch does not
   rewrite prompts that were already assembled. A version created before the change keeps its old
   prompt, so set the input type first and add the version after. Adding a version moves the pinned
   version on any log stream where the metric is already enabled, so no second enable call is needed.
