@@ -27,7 +27,9 @@ verifying before a session-level judge is put in front of a brand or tone questi
 Python 3.9 or newer. Standard library only, so there is nothing to install and no Galileo SDK
 version to pin.
 
-Live mode additionally needs a deployment URL and an API key. Copy `.env.sample` to `.env`, fill it
+Live mode additionally needs your deployment's API base URL and an API key. The API host is the one
+that serves the OTLP endpoint, and on most deployments it is a different hostname from the console, so
+set `GALILEO_API_URL` rather than relying on the console URL. Copy `.env.sample` to `.env`, fill it
 in, then:
 
 ```

@@ -152,11 +152,24 @@ def rewrite(doc: dict, run_tag: str) -> dict:
 # --- API client -------------------------------------------------------------
 
 
+def resolve_api_base(api_url: str | None, console_url: str) -> str:
+    """The OTLP endpoint is served by the API host, which is not the console host.
+
+    On most deployments the console is served from one hostname and the API from
+    another, so posting spans to the console URL does not reach the ingest route.
+    GALILEO_API_URL is therefore the variable that matters for live mode, and the
+    console URL is only a fallback for the case where one host serves both.
+    """
+    host = (api_url or console_url).rstrip("/")
+    # A local stack serves the console and the API on different ports of localhost.
+    if "localhost" in host or "127.0.0.1" in host:
+        return "http://localhost:8088"
+    return host
+
+
 class Galileo:
-    def __init__(self, console_url: str, api_key: str) -> None:
-        host = console_url.rstrip("/")
-        # Local dev serves the console on one port and the API on another.
-        self.base = "http://localhost:8088" if "localhost" in host or "127.0.0.1" in host else host
+    def __init__(self, api_base: str, api_key: str) -> None:
+        self.base = api_base.rstrip("/")
         self.key = api_key
 
     def _call(self, path: str, body: Any = None, method: str = "POST", extra: dict | None = None) -> Any:
@@ -334,16 +347,19 @@ def main() -> int:
         return 0
 
     console_url = os.environ.get("GALILEO_CONSOLE_URL")
+    api_url = os.environ.get("GALILEO_API_URL")
     api_key = os.environ.get("GALILEO_API_KEY")
     project = os.environ.get("GALILEO_PROJECT")
     log_stream = os.environ.get("GALILEO_LOG_STREAM")
-    if not all((console_url, api_key, project, log_stream)):
+    if not (api_url or console_url) or not all((api_key, project, log_stream)):
         sys.exit(
-            "live mode needs GALILEO_CONSOLE_URL, GALILEO_API_KEY, GALILEO_PROJECT and "
-            "GALILEO_LOG_STREAM set.\nSee .env.sample."
+            "live mode needs GALILEO_API_URL (or GALILEO_CONSOLE_URL), GALILEO_API_KEY, "
+            "GALILEO_PROJECT and GALILEO_LOG_STREAM set.\nSee .env.sample."
         )
 
-    api = Galileo(console_url, api_key)
+    api_base = resolve_api_base(api_url, console_url or "")
+    print(f"posting to {api_base}{INGEST_PATH}")
+    api = Galileo(api_base, api_key)
     run_tag = format(int(time.time()) % 100_000_000, "08x")
     results = {s: live(s, api, project, log_stream, run_tag, args.brief) for s in scenarios}
 
